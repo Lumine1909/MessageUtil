@@ -20,7 +20,8 @@ public class MessengerManager {
     private static final Map<String, Set<Holder<MessageReceiver.Payload>>> key2Payloads = new HashMap<>();
     private static final Map<String, Set<Holder<MessageReceiver.Bytebuf>>> key2Bytebuf = new HashMap<>();
     private static final Map<Class<? extends Packet<?>>, Set<Holder<MessageReceiver.Vanilla>>> key2Vanilla = new HashMap<>();
-    private static final Comparator<Holder<?>> DESC_COMPARATOR = (a, b) -> Integer.compare(b.priority(), a.priority());
+    private static final Comparator<Holder<?>> DESC_COMPARATOR = Comparator.comparing((Holder<?> h) -> h.priority()).reversed().thenComparing(Record::toString, Comparator.reverseOrder());
+
     private static final Map<MessageReceiver.Payload, StreamCodec<? extends ByteBuf, ?>> payloadCodecs = new HashMap<>();
 
     public MessengerManager() {
