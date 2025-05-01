@@ -6,26 +6,21 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-public class PacketInterceptor extends ChannelDuplexHandler {
-
-    private String playerName;
+public abstract class PacketInterceptor extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof Packet<?> packet) {
-            MessengerManager.INSTANCE.handleVanilla(getPlayer(), packet);
+            MessengerManager.INSTANCE.handleVanilla(player(), packet);
         }
         if (msg instanceof ServerboundCustomPayloadPacket(CustomPacketPayload payload) &&
             payload instanceof DiscardedPayload discardedPayload) {
-            MessengerManager.INSTANCE.handlePayload(getPlayer(), discardedPayload);
-            MessengerManager.INSTANCE.handleBytebuf(getPlayer(), discardedPayload);
+            MessengerManager.INSTANCE.handlePayload(player(), discardedPayload);
+            MessengerManager.INSTANCE.handleBytebuf(player(), discardedPayload);
         }
     }
 
-    private ServerPlayer getPlayer() {
-        return MinecraftServer.getServer().getPlayerList().getPlayerByName(playerName);
-    }
+    protected abstract ServerPlayer player();
 }

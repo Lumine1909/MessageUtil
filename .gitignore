@@ -5,6 +5,7 @@ gradle/wrapper/gradle-wrapper.jar
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
+gradle.properties
 .idea
 .idea/modules.xml
 .idea/jarRepositories.xml
