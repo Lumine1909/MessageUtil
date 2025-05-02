@@ -23,7 +23,7 @@ public record Holder<T>(T type, Method invoker, MessageReceiver receiver) {
         return 0;
     }
 
-    public void invoke(PacketContext context, Object object) {
+    public void invoke(PacketContext context, PacketEvent event, Object object) {
         try {
             invoker.invoke(receiver, context, object);
         } catch (Exception e) {

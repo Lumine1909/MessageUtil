@@ -4,6 +4,7 @@ import io.github.lumine1909.messageutil.api.Codec;
 import io.github.lumine1909.messageutil.api.MessageReceiver;
 import io.github.lumine1909.messageutil.object.Holder;
 import io.github.lumine1909.messageutil.object.PacketContext;
+import io.github.lumine1909.messageutil.object.PacketEvent;
 import io.github.lumine1909.messageutil.util.ProtocolUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -96,9 +97,10 @@ public class MessengerManager {
         if (!key2Payloads.containsKey(id)) {
             return;
         }
+        PacketEvent event = new PacketEvent();
         for (Holder<MessageReceiver.Payload> holder : key2Payloads.get(id)) {
-            if (holder.receiver().isActive()) {
-                holder.invoke(context, transferPayload(payload, payloadCodecs.get(holder.type())));
+            if (holder.receiver().isActive() && holder.type().ignoreCancelled() || !event.isCancelled()) {
+                holder.invoke(context, event, transferPayload(payload, payloadCodecs.get(holder.type())));
             }
         }
     }
@@ -108,9 +110,10 @@ public class MessengerManager {
         if (!key2Bytebuf.containsKey(id)) {
             return;
         }
+        PacketEvent event = new PacketEvent();
         for (Holder<MessageReceiver.Bytebuf> holder : key2Bytebuf.get(id)) {
-            if (holder.receiver().isActive()) {
-                holder.invoke(context, ProtocolUtil.decorate(payload.data()));
+            if (holder.receiver().isActive() && holder.type().ignoreCancelled() || !event.isCancelled()) {
+                holder.invoke(context, event, ProtocolUtil.decorate(payload.data()));
             }
         }
     }
@@ -119,9 +122,10 @@ public class MessengerManager {
         if (!key2Vanilla.containsKey(packet.getClass())) {
             return;
         }
+        PacketEvent event = new PacketEvent();
         for (Holder<MessageReceiver.Vanilla> holder : key2Vanilla.get(packet.getClass())) {
-            if (holder.receiver().isActive()) {
-                holder.invoke(context, packet);
+            if (holder.receiver().isActive() && holder.type().ignoreCancelled() || !event.isCancelled()) {
+                holder.invoke(context, event, packet);
             }
         }
     }

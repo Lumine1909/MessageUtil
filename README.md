@@ -26,15 +26,16 @@ public class DemoPlugin extends JavaPlugin implements Listener {
 }
 ```
 
-```java
-package io.github.lumine1909;
+```javapackage io.github.lumine1909;
 
 import io.github.lumine1909.messageutil.api.MessageReceiver;
 import io.github.lumine1909.messageutil.object.PacketContext;
+import io.github.lumine1909.messageutil.object.PacketEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -46,8 +47,8 @@ public class DemoReceiver extends MessageReceiver {
     }
 
     @Bytebuf(key = "blocktuner:server_bound_hello")
-    public void handleHello(PacketContext context, FriendlyByteBuf buf) {
-        System.out.println("Received Hello packet");
+    public void handleHello(PacketContext context, PacketEvent event, FriendlyByteBuf buf) {
+        event.setCancelled(true);
         int protocolVersion = buf.readInt();
         if (protocolVersion == 3) {
             context.send("blocktuner:client_bound_hello", buf);
@@ -55,7 +56,8 @@ public class DemoReceiver extends MessageReceiver {
     }
 
     @Bytebuf(key = "blocktuner:server_bound_tuning")
-    public void handleTuning(PacketContext context, FriendlyByteBuf buf) {
+    public void handleTuning(PacketContext context, PacketEvent event, FriendlyByteBuf buf) {
+        event.setCancelled(true);
         ServerPlayer player = context.player().orElseThrow();
         BlockPos pos = buf.readBlockPos();
         Level world = player.level();
@@ -64,5 +66,11 @@ public class DemoReceiver extends MessageReceiver {
         }
         player.sendSystemMessage(Component.literal("Sorry, this is a fake tuning plugin").withStyle(ChatFormatting.AQUA));
     }
+
+    @Vanilla(packetType = ServerboundChatCommandPacket.class)
+    public void handleCommand(PacketContext context, PacketEvent event, ServerboundChatCommandPacket packet) {
+        context.player().orElseThrow().sendSystemMessage(Component.literal("Stop sending command " + packet.command() + "!").withStyle(ChatFormatting.RED));
+    }
 }
+
 ```

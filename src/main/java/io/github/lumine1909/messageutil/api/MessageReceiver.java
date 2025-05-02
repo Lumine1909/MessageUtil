@@ -20,6 +20,8 @@ public abstract class MessageReceiver {
         Class<?> codec();
 
         int priority() default 0;
+
+        boolean ignoreCancelled() default true;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -29,6 +31,8 @@ public abstract class MessageReceiver {
         String key();
 
         int priority() default 0;
+
+        boolean ignoreCancelled() default true;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -38,6 +42,8 @@ public abstract class MessageReceiver {
         Class<? extends Packet<?>> packetType();
 
         int priority() default 0;
+
+        boolean ignoreCancelled() default true;
     }
 
 }
