@@ -1,20 +1,26 @@
 package io.github.lumine1909.messageutil.api;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import io.github.lumine1909.messageutil.core.MessengerManager;
 import io.github.lumine1909.messageutil.inject.ChannelInitInjector;
 import io.github.lumine1909.messageutil.inject.Injector;
 import io.github.lumine1909.messageutil.inject.PlayerJoinEventInjector;
 import io.github.lumine1909.messageutil.inject.PlayerListInjector;
-import io.github.lumine1909.messageutil.util.InternalPlugin;
 import org.bukkit.plugin.Plugin;
 
 public class MessageUtil {
 
-    public static Plugin plugin = InternalPlugin.INSTANCE;
+    private static final BiMap<MessageUtil, Plugin> CACHE = HashBiMap.create();
+    private static Injector injector;
 
-    private final Injector injector;
+    private final Plugin plugin;
 
-    public MessageUtil(InjectorType type) {
+    public MessageUtil(Plugin plugin, InjectorType type) {
+        this.plugin = plugin;
+        if (injector == null) {
+            return;
+        }
         switch (type) {
             case PLAYER_LIST -> injector = new PlayerListInjector();
             case PLAYER_JOIN_EVENT -> injector = new PlayerJoinEventInjector();
@@ -23,12 +29,18 @@ public class MessageUtil {
         }
     }
 
-    public void inject() {
-        injector.inject();
+    public void enable() {
+        if (CACHE.isEmpty()) {
+            injector.inject();
+        }
+        CACHE.put(this, plugin);
     }
 
-    public void uninject() {
-        injector.uninject();
+    public void disable() {
+        CACHE.remove(this);
+        if (CACHE.isEmpty()) {
+            injector.uninject();
+        }
     }
 
     public MessengerManager getMessengerManager() {

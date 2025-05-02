@@ -2,7 +2,6 @@ package io.github.lumine1909.messageutil.inject;
 
 import io.github.lumine1909.messageutil.core.PacketInterceptor;
 import io.netty.channel.ChannelHandlerContext;
-import io.papermc.paper.network.ChannelInitializeListener;
 import io.papermc.paper.network.ChannelInitializeListenerHolder;
 import net.kyori.adventure.key.Key;
 import net.minecraft.network.protocol.login.ServerboundHelloPacket;

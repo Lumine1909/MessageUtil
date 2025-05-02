@@ -28,6 +28,26 @@ public class MessengerManager {
 
     }
 
+    @SuppressWarnings("unchecked")
+    private static <B, V> V transferPayload(DiscardedPayload payload, StreamCodec<B, V> codec) {
+        return codec.decode((B) ProtocolUtil.decorate(payload.data()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void extractCodec(MessageReceiver.Payload annotation) {
+        Class<?> payloadClass = annotation.codec();
+        for (Field field : payloadClass.getDeclaredFields()) {
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(Codec.class)) {
+                try {
+                    payloadCodecs.put(annotation, (StreamCodec<? extends ByteBuf, ?>) field.get(null));
+                    return;
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
     public void register(MessageReceiver receiver) {
         Class<?> clazz = receiver.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
@@ -98,27 +118,6 @@ public class MessengerManager {
             holder.invoke(player, packet);
         }
     }
-
-    @SuppressWarnings("unchecked")
-    private static <B, V> V transferPayload(DiscardedPayload payload, StreamCodec<B, V> codec) {
-        return codec.decode((B) ProtocolUtil.decorate(payload.data()));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void extractCodec(MessageReceiver.Payload annotation) {
-        Class<?> payloadClass = annotation.codec();
-        for (Field field : payloadClass.getDeclaredFields()) {
-            field.setAccessible(true);
-            if (field.isAnnotationPresent(Codec.class)) {
-                try {
-                    payloadCodecs.put(annotation, (StreamCodec<? extends ByteBuf, ?>) field.get(null));
-                    return;
-                } catch (Exception ignored) {
-                }
-            }
-        }
-    }
-
 
     public record Holder<T>(T type, Method invoker, MessageReceiver receiver) {
 

@@ -6,7 +6,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.*;
+import org.bukkit.plugin.PluginBase;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginLoader;
+import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,18 +20,12 @@ import java.util.List;
 public class InternalPlugin extends PluginBase {
 
     public static final InternalPlugin INSTANCE = new InternalPlugin();
-
-    private boolean enabled = true;
-
     private final PluginDescriptionFile pdf;
+    private boolean enabled = true;
 
     public InternalPlugin() {
         String pluginName = "MessageUtilInternal";
         pdf = new PluginDescriptionFile(pluginName, "1.0", "nms");
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     @Override
@@ -94,6 +91,10 @@ public class InternalPlugin extends PluginBase {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
