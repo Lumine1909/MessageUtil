@@ -18,7 +18,7 @@ public class MessageUtil {
 
     public MessageUtil(Plugin plugin, InjectorType type) {
         this.plugin = plugin;
-        if (injector == null) {
+        if (injector != null) {
             return;
         }
         switch (type) {
