@@ -96,7 +96,9 @@ public class MessengerManager {
             return;
         }
         for (Holder<MessageReceiver.Payload> holder : key2Payloads.get(id)) {
-            holder.invoke(player, transferPayload(payload, payloadCodecs.get(holder.type)));
+            if (holder.receiver.isActive()) {
+                holder.invoke(player, transferPayload(payload, payloadCodecs.get(holder.type)));
+            }
         }
     }
 
@@ -106,7 +108,9 @@ public class MessengerManager {
             return;
         }
         for (Holder<MessageReceiver.Bytebuf> holder : key2Bytebuf.get(id)) {
-            holder.invoke(player, ProtocolUtil.decorate(payload.data()));
+            if (holder.receiver.isActive()) {
+                holder.invoke(player, ProtocolUtil.decorate(payload.data()));
+            }
         }
     }
 
@@ -115,7 +119,9 @@ public class MessengerManager {
             return;
         }
         for (Holder<MessageReceiver.Vanilla> holder : key2Vanilla.get(packet.getClass())) {
-            holder.invoke(player, packet);
+            if (holder.receiver.isActive()) {
+                holder.invoke(player, packet);
+            }
         }
     }
 
