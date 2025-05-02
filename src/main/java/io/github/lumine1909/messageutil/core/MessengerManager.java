@@ -110,7 +110,6 @@ public class MessengerManager {
         }
         for (Holder<MessageReceiver.Bytebuf> holder : key2Bytebuf.get(id)) {
             if (holder.receiver().isActive()) {
-                System.out.println(holder.invoker().getName());
                 holder.invoke(context, ProtocolUtil.decorate(payload.data()));
             }
         }
