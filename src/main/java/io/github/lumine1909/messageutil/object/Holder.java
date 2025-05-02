@@ -23,10 +23,11 @@ public record Holder<T>(T type, Method invoker, MessageReceiver receiver) {
         return 0;
     }
 
-    public void invoke(PacketContext context, Object... objects) {
+    public void invoke(PacketContext context, Object object) {
         try {
-            invoker.invoke(receiver, context, objects);
-        } catch (Exception ignored) {
+            invoker.invoke(receiver, context, object);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

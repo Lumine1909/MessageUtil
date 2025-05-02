@@ -2,6 +2,7 @@ package io.github.lumine1909.messageutil.object;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -23,6 +24,12 @@ public class PacketContext {
         this.name = player.getGameProfile().getName();
         this.player = player;
         this.channel = player.connection.connection.channel;
+    }
+
+    public PacketContext(ServerPlayer notPreparedPlayer, Connection connection) {
+        this.player = notPreparedPlayer;
+        this.channel = connection.channel;
+        this.name = notPreparedPlayer.getGameProfile().getName();
     }
 
     public PacketContext(Channel channel, String name) {

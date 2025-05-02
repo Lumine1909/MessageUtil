@@ -20,6 +20,7 @@ public abstract class PacketInterceptor extends ChannelDuplexHandler {
             MessengerManager.INSTANCE.handlePayload(context(), discardedPayload);
             MessengerManager.INSTANCE.handleBytebuf(context(), discardedPayload);
         }
+        super.channelRead(ctx, msg);
     }
 
     protected abstract PacketContext context();

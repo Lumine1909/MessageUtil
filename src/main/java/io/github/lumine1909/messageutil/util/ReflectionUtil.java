@@ -1,20 +1,41 @@
 package io.github.lumine1909.messageutil.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 public class ReflectionUtil {
 
     public static void copyFields(Object from, Object to) {
-        for (Field fromField : from.getClass().getDeclaredFields()) {
-            fromField.setAccessible(true);
+
+        Class<?> fromClass = from.getClass();
+        Class<?> toClass = to.getClass();
+
+        while (fromClass != null) {
+            for (Field field : fromClass.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+                field.setAccessible(true);
+                try {
+                    Field toField = getFieldInHierarchy(toClass, field.getName());
+                    toField.setAccessible(true);
+                    toField.set(to, field.get(from));
+                } catch (Exception ignored) {
+                }
+            }
+            fromClass = fromClass.getSuperclass();
+        }
+    }
+
+    private static Field getFieldInHierarchy(Class<?> clazz, String name) {
+        while (clazz != null) {
             try {
-                Field toField = to.getClass().getDeclaredField(fromField.getName());
-                toField.setAccessible(true);
-                toField.set(to, fromField.get(from));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                return clazz.getDeclaredField(name);
+            } catch (NoSuchFieldException ignored) {
+                clazz = clazz.getSuperclass();
             }
         }
+        return null;
     }
 
     public static class FieldAccessor {
