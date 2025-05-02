@@ -1,6 +1,7 @@
 package io.github.lumine1909.messageutil.inject;
 
 import io.github.lumine1909.messageutil.core.PacketInterceptor;
+import io.github.lumine1909.messageutil.object.PacketContext;
 import io.github.lumine1909.messageutil.util.ReflectionUtil;
 import net.minecraft.network.Connection;
 import net.minecraft.server.MinecraftServer;
@@ -36,10 +37,11 @@ public class PlayerListInjector implements Injector {
     }
 
     protected void inject2Player(Connection connection, ServerPlayer player) {
+        PacketContext context = new PacketContext(player);
         connection.channel.pipeline().addBefore("packet_handler", "pli_handler", new PacketInterceptor() {
             @Override
-            protected ServerPlayer player() {
-                return player;
+            protected PacketContext context() {
+                return context;
             }
         });
     }

@@ -1,6 +1,7 @@
 package io.github.lumine1909.messageutil.inject;
 
 import io.github.lumine1909.messageutil.core.PacketInterceptor;
+import io.github.lumine1909.messageutil.object.PacketContext;
 import io.github.lumine1909.messageutil.util.InternalPlugin;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
@@ -17,11 +18,11 @@ public class PlayerJoinEventInjector implements Listener, Injector {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         ServerPlayer sp = ((CraftPlayer) player).getHandle();
+        PacketContext context = new PacketContext(sp);
         sp.connection.connection.channel.pipeline().addBefore("packet_handler", "pjei_handler", new PacketInterceptor() {
-
             @Override
-            protected ServerPlayer player() {
-                return sp;
+            protected PacketContext context() {
+                return context;
             }
         });
     }

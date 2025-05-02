@@ -2,12 +2,13 @@ package io.github.lumine1909.messageutil.core;
 
 import io.github.lumine1909.messageutil.api.Codec;
 import io.github.lumine1909.messageutil.api.MessageReceiver;
+import io.github.lumine1909.messageutil.object.Holder;
+import io.github.lumine1909.messageutil.object.PacketContext;
 import io.github.lumine1909.messageutil.util.ProtocolUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
-import net.minecraft.server.level.ServerPlayer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -90,64 +91,37 @@ public class MessengerManager {
         }
     }
 
-    public void handlePayload(ServerPlayer player, DiscardedPayload payload) {
+    public void handlePayload(PacketContext context, DiscardedPayload payload) {
         String id = payload.id().toString().toLowerCase();
         if (!key2Payloads.containsKey(id)) {
             return;
         }
         for (Holder<MessageReceiver.Payload> holder : key2Payloads.get(id)) {
-            if (holder.receiver.isActive()) {
-                holder.invoke(player, transferPayload(payload, payloadCodecs.get(holder.type)));
+            if (holder.receiver().isActive()) {
+                holder.invoke(context, transferPayload(payload, payloadCodecs.get(holder.type())));
             }
         }
     }
 
-    public void handleBytebuf(ServerPlayer player, DiscardedPayload payload) {
+    public void handleBytebuf(PacketContext context, DiscardedPayload payload) {
         String id = payload.id().toString().toLowerCase();
         if (!key2Bytebuf.containsKey(id)) {
             return;
         }
         for (Holder<MessageReceiver.Bytebuf> holder : key2Bytebuf.get(id)) {
-            if (holder.receiver.isActive()) {
-                holder.invoke(player, ProtocolUtil.decorate(payload.data()));
+            if (holder.receiver().isActive()) {
+                holder.invoke(context, ProtocolUtil.decorate(payload.data()));
             }
         }
     }
 
-    public void handleVanilla(ServerPlayer player, Packet<?> packet) {
+    public void handleVanilla(PacketContext context, Packet<?> packet) {
         if (!key2Vanilla.containsKey(packet.getClass())) {
             return;
         }
         for (Holder<MessageReceiver.Vanilla> holder : key2Vanilla.get(packet.getClass())) {
-            if (holder.receiver.isActive()) {
-                holder.invoke(player, packet);
-            }
-        }
-    }
-
-    public record Holder<T>(T type, Method invoker, MessageReceiver receiver) {
-
-        public static <T> Holder<T> of(T type, Method invoker, MessageReceiver receiver) {
-            return new Holder<>(type, invoker, receiver);
-        }
-
-        public int priority() {
-            if (type instanceof MessageReceiver.Payload p) {
-                return p.priority();
-            }
-            if (type instanceof MessageReceiver.Bytebuf b) {
-                return b.priority();
-            }
-            if (type instanceof MessageReceiver.Vanilla v) {
-                return v.priority();
-            }
-            return 0;
-        }
-
-        public void invoke(ServerPlayer player, Object... objects) {
-            try {
-                invoker.invoke(receiver, player, objects);
-            } catch (Exception ignored) {
+            if (holder.receiver().isActive()) {
+                holder.invoke(context, packet);
             }
         }
     }
