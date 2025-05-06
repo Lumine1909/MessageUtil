@@ -25,7 +25,7 @@ public record Holder<T>(T type, Method invoker, MessageReceiver receiver) {
 
     public void invoke(PacketContext context, PacketEvent event, Object object) {
         try {
-            invoker.invoke(receiver, context, object);
+            invoker.invoke(receiver, context, event, object);
         } catch (Exception e) {
             e.printStackTrace();
         }

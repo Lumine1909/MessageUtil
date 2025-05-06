@@ -5,4 +5,6 @@ public interface Injector {
     void inject();
 
     void uninject();
+
+    boolean isInjected();
 }

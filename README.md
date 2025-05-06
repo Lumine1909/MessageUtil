@@ -1,4 +1,15 @@
 ## A Demo Usage
+```kotlin
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.github.lumine1909:messageutil:1.0.1-SNAPSHOT")
+}
+```
+
 
 ```java
 package io.github.lumine1909;
@@ -26,7 +37,8 @@ public class DemoPlugin extends JavaPlugin implements Listener {
 }
 ```
 
-```javapackage io.github.lumine1909;
+```java
+package io.github.lumine1909;
 
 import io.github.lumine1909.messageutil.api.MessageReceiver;
 import io.github.lumine1909.messageutil.object.PacketContext;

@@ -1,5 +1,7 @@
 package io.github.lumine1909.messageutil.util;
 
+import io.github.lumine1909.messageutil.inject.InstantInjectManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -26,6 +28,7 @@ public class InternalPlugin extends PluginBase {
     public InternalPlugin() {
         String pluginName = "MessageUtilInternal";
         pdf = new PluginDescriptionFile(pluginName, "1.0", "nms");
+        Bukkit.getPluginManager().registerEvents(new InstantInjectManager.AutoUninjectListener(), this);
     }
 
     @Override

@@ -3,29 +3,61 @@ package io.github.lumine1909.messageutil.api;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import io.github.lumine1909.messageutil.core.MessengerManager;
-import io.github.lumine1909.messageutil.inject.ChannelInitInjector;
-import io.github.lumine1909.messageutil.inject.Injector;
-import io.github.lumine1909.messageutil.inject.PlayerJoinEventInjector;
-import io.github.lumine1909.messageutil.inject.PlayerListInjector;
+import io.github.lumine1909.messageutil.inject.*;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class MessageUtil {
 
     private static final BiMap<MessageUtil, Plugin> CACHE = HashBiMap.create();
     private static Injector injector;
+    private static InjectorType injectorType;
 
     private final Plugin plugin;
 
+    public MessageUtil(Plugin plugin) {
+        this(plugin, InjectorType.CHANNEL_INIT);
+    }
+
     public MessageUtil(Plugin plugin, InjectorType type) {
+        this(plugin, type, null);
+    }
+
+    public MessageUtil(Plugin plugin, InjectorType type, Injector customInjector) {
         this.plugin = plugin;
-        if (injector != null) {
+        if (injectorType != null && type.ordinal() <= injectorType.ordinal()) {
             return;
         }
-        switch (type) {
-            case PLAYER_LIST -> injector = new PlayerListInjector();
-            case PLAYER_JOIN_EVENT -> injector = new PlayerJoinEventInjector();
-            case CHANNEL_INIT -> injector = new ChannelInitInjector();
-            default -> throw new RuntimeException("Invalid injector type");
+        refreshInjector(type, customInjector);
+    }
+
+    public void injectDirect(Player player) {
+        InstantInjectManager.injectPlayer(player);
+    }
+
+    public void uninjectDirect(Player player) {
+        InstantInjectManager.uninjectPlayer(player);
+    }
+
+    private void refreshInjector(InjectorType type, Injector customInjector) {
+        boolean wasInjected = injector != null && injector.isInjected();
+        if (wasInjected) {
+            injector.uninject();
+        }
+        injector = switch (type) {
+            case PLAYER_JOIN_EVENT -> new PlayerJoinEventInjector();
+            case PLAYER_LIST -> new PlayerListInjector();
+            case CHANNEL_INIT -> new ChannelInitInjector();
+            case CUSTOM -> {
+                if (customInjector == null) {
+                    throw new IllegalArgumentException("Custom injector cannot be null");
+                }
+                yield customInjector;
+            }
+        };
+        injectorType = type;
+        if (wasInjected) {
+            injector.inject();
         }
     }
 
@@ -48,6 +80,9 @@ public class MessageUtil {
     }
 
     public enum InjectorType {
-        CHANNEL_INIT, PLAYER_JOIN_EVENT, PLAYER_LIST
+        PLAYER_JOIN_EVENT,
+        PLAYER_LIST,
+        CHANNEL_INIT,
+        CUSTOM
     }
 }

@@ -69,6 +69,10 @@ public class PacketContext {
         channel.writeAndFlush(packet);
     }
 
+    public void send(String id, byte[] data) {
+        channel.writeAndFlush(new ClientboundCustomPayloadPacket(new DiscardedPayload(ResourceLocation.parse(id), data)));
+    }
+
     public void send(String id, ByteBuf data) {
         channel.writeAndFlush(new ClientboundCustomPayloadPacket(new DiscardedPayload(ResourceLocation.parse(id), data.array())));
     }

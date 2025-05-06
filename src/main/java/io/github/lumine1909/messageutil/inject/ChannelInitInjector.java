@@ -13,6 +13,8 @@ public class ChannelInitInjector implements Injector {
 
     private static final Key LISTENER_KEY = Key.key("messageutil:cii");
 
+    private boolean injected = false;
+
     @Override
     public void inject() {
         ChannelInitializeListenerHolder.addListener(LISTENER_KEY, channel -> channel.pipeline().addBefore("packet_handler", "cii_handler", new PacketInterceptor() {
@@ -31,10 +33,17 @@ public class ChannelInitInjector implements Injector {
                 return context;
             }
         }));
+        injected = true;
     }
 
     @Override
     public void uninject() {
         ChannelInitializeListenerHolder.removeListener(LISTENER_KEY);
+        injected = false;
+    }
+
+    @Override
+    public boolean isInjected() {
+        return injected;
     }
 }

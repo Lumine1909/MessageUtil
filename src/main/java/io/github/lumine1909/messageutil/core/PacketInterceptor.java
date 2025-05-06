@@ -12,13 +12,17 @@ public abstract class PacketInterceptor extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        boolean handled = false;
         if (msg instanceof Packet<?> packet) {
-            MessengerManager.INSTANCE.handleVanilla(context(), packet);
+            handled = MessengerManager.INSTANCE.handleVanilla(context(), packet) || handled;
         }
         if (msg instanceof ServerboundCustomPayloadPacket(CustomPacketPayload payload) &&
             payload instanceof DiscardedPayload discardedPayload) {
-            MessengerManager.INSTANCE.handlePayload(context(), discardedPayload);
-            MessengerManager.INSTANCE.handleBytebuf(context(), discardedPayload);
+            handled = MessengerManager.INSTANCE.handlePayload(context(), discardedPayload) || handled;
+            handled = MessengerManager.INSTANCE.handleBytebuf(context(), discardedPayload) || handled;
+        }
+        if (handled) {
+            return;
         }
         super.channelRead(ctx, msg);
     }

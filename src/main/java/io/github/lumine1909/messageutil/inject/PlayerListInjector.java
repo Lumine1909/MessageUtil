@@ -19,28 +19,8 @@ public class PlayerListInjector implements Injector {
 
     private static final ReflectionUtil.FieldAccessor Field$MinecraftServer$playerList = new ReflectionUtil.FieldAccessor(MinecraftServer.class, "playerList");
 
+    private boolean injected;
     private InjectedPlayerList injectedPlayerList;
-
-    @Override
-    public void inject() {
-        injectedPlayerList = createInjectedPlayerList();
-        Field$MinecraftServer$playerList.set(MinecraftServer.getServer(), injectedPlayerList);
-    }
-
-    @Override
-    public void uninject() {
-        DedicatedPlayerList original = injectedPlayerList.getOriginal();
-        ReflectionUtil.copyFields(injectedPlayerList, original);
-        Field$MinecraftServer$playerList.set(MinecraftServer.getServer(), original);
-    }
-
-    private InjectedPlayerList createInjectedPlayerList() {
-        DedicatedPlayerList original = (DedicatedPlayerList) MinecraftServer.getServer().getPlayerList();
-        InjectedPlayerList playerList = UnsafeUtil.createInstance(InjectedPlayerList.class);
-        playerList.setOriginal(original);
-        ReflectionUtil.copyFields(original, playerList);
-        return playerList;
-    }
 
     protected static void inject2Player(Connection connection, ServerPlayer player) {
         PacketContext context = new PacketContext(player, connection);
@@ -50,6 +30,34 @@ public class PlayerListInjector implements Injector {
                 return context;
             }
         });
+    }
+
+    @Override
+    public void inject() {
+        injectedPlayerList = createInjectedPlayerList();
+        Field$MinecraftServer$playerList.set(MinecraftServer.getServer(), injectedPlayerList);
+        injected = true;
+    }
+
+    @Override
+    public void uninject() {
+        DedicatedPlayerList original = injectedPlayerList.getOriginal();
+        ReflectionUtil.copyFields(injectedPlayerList, original);
+        Field$MinecraftServer$playerList.set(MinecraftServer.getServer(), original);
+        injected = false;
+    }
+
+    @Override
+    public boolean isInjected() {
+        return injected;
+    }
+
+    private InjectedPlayerList createInjectedPlayerList() {
+        DedicatedPlayerList original = (DedicatedPlayerList) MinecraftServer.getServer().getPlayerList();
+        InjectedPlayerList playerList = UnsafeUtil.createInstance(InjectedPlayerList.class);
+        playerList.setOriginal(original);
+        ReflectionUtil.copyFields(original, playerList);
+        return playerList;
     }
 
     private static class InjectedPlayerList extends DedicatedPlayerList {

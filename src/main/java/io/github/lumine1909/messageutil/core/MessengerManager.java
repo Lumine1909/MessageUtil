@@ -92,10 +92,10 @@ public class MessengerManager {
         }
     }
 
-    public void handlePayload(PacketContext context, DiscardedPayload payload) {
+    public boolean handlePayload(PacketContext context, DiscardedPayload payload) {
         String id = payload.id().toString().toLowerCase();
         if (!key2Payloads.containsKey(id)) {
-            return;
+            return false;
         }
         PacketEvent event = new PacketEvent();
         for (Holder<MessageReceiver.Payload> holder : key2Payloads.get(id)) {
@@ -103,12 +103,13 @@ public class MessengerManager {
                 holder.invoke(context, event, transferPayload(payload, payloadCodecs.get(holder.type())));
             }
         }
+        return event.isCancelled();
     }
 
-    public void handleBytebuf(PacketContext context, DiscardedPayload payload) {
+    public boolean handleBytebuf(PacketContext context, DiscardedPayload payload) {
         String id = payload.id().toString().toLowerCase();
         if (!key2Bytebuf.containsKey(id)) {
-            return;
+            return false;
         }
         PacketEvent event = new PacketEvent();
         for (Holder<MessageReceiver.Bytebuf> holder : key2Bytebuf.get(id)) {
@@ -116,11 +117,12 @@ public class MessengerManager {
                 holder.invoke(context, event, ProtocolUtil.decorate(payload.data()));
             }
         }
+        return event.isCancelled();
     }
 
-    public void handleVanilla(PacketContext context, Packet<?> packet) {
+    public boolean handleVanilla(PacketContext context, Packet<?> packet) {
         if (!key2Vanilla.containsKey(packet.getClass())) {
-            return;
+            return false;
         }
         PacketEvent event = new PacketEvent();
         for (Holder<MessageReceiver.Vanilla> holder : key2Vanilla.get(packet.getClass())) {
@@ -128,5 +130,6 @@ public class MessengerManager {
                 holder.invoke(context, event, packet);
             }
         }
+        return event.isCancelled();
     }
 }

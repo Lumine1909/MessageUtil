@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinEventInjector implements Listener, Injector {
 
+    private boolean injected = false;
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -30,10 +31,17 @@ public class PlayerJoinEventInjector implements Listener, Injector {
     @Override
     public void inject() {
         Bukkit.getPluginManager().registerEvents(this, InternalPlugin.INSTANCE);
+        injected = true;
     }
 
     @Override
     public void uninject() {
         PlayerJoinEvent.getHandlerList().unregister(InternalPlugin.INSTANCE);
+        injected = false;
+    }
+
+    @Override
+    public boolean isInjected() {
+        return injected;
     }
 }

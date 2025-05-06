@@ -11,7 +11,7 @@ plugins {
 
 group = "io.github.lumine1909"
 version = "1.0.1"
-description = "A utility project for handling mod message in bukkit server"
+description = "A utility project for handling mod and packet message in plugin-side"
 
 repositories {
     mavenCentral()
