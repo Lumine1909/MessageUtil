@@ -14,7 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.*;
 
 public class PacketContext {
 
@@ -23,33 +23,42 @@ public class PacketContext {
     private final Channel channel;
     private ServerPlayer player;
     private String name;
+    private final String interceptor;
 
-    public PacketContext(ServerPlayer player) {
+    public PacketContext(ServerPlayer player, String interceptor) {
         this.name = player.getGameProfile().getName();
         this.player = player;
         this.channel = player.connection.connection.channel;
+        this.interceptor = interceptor;
         CONTEXT_CACHE.put(name, this);
     }
 
-    public PacketContext(ServerPlayer notPreparedPlayer, Connection connection) {
+    public PacketContext(ServerPlayer notPreparedPlayer, Connection connection, String interceptor) {
         this.player = notPreparedPlayer;
         this.channel = connection.channel;
         this.name = notPreparedPlayer.getGameProfile().getName();
+        this.interceptor = interceptor;
         CONTEXT_CACHE.put(name, this);
     }
 
-    public PacketContext(Channel channel, String name) {
+    public PacketContext(Channel channel, String name, String interceptor) {
         this.name = name;
         this.channel = channel;
+        this.interceptor = interceptor;
         CONTEXT_CACHE.put(name, this);
     }
 
-    public PacketContext(Channel channel) {
+    public PacketContext(Channel channel, String interceptor) {
         this.channel = channel;
+        this.interceptor = interceptor;
     }
 
     private static @Nullable ServerPlayer byName(String name) {
         return MinecraftServer.getServer().getPlayerList().getPlayerByName(name);
+    }
+
+    public String interceptor() {
+        return interceptor;
     }
 
     public void setPlayer(ServerPlayer player) {
@@ -59,6 +68,7 @@ public class PacketContext {
 
     public void setName(String name) {
         this.name = name;
+        CONTEXT_CACHE.put(name, this);
     }
 
     public Optional<ServerPlayer> player() {

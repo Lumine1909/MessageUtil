@@ -11,6 +11,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.util.UUID;
+
 public class PlayerJoinEventInjector implements Listener, Injector {
 
     private boolean injected = false;
@@ -19,8 +21,9 @@ public class PlayerJoinEventInjector implements Listener, Injector {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         ServerPlayer sp = ((CraftPlayer) player).getHandle();
-        PacketContext context = new PacketContext(sp);
-        sp.connection.connection.channel.pipeline().addBefore("packet_handler", "pjei_handler", new PacketInterceptor() {
+        String name = "pjei_handler" + UUID.randomUUID();
+        PacketContext context = new PacketContext(sp, name);
+        sp.connection.connection.channel.pipeline().addBefore("packet_handler", name, new PacketInterceptor() {
             @Override
             protected PacketContext context() {
                 return context;

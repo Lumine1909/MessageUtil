@@ -11,14 +11,16 @@ import java.util.UUID;
 
 public class ChannelInitInjector implements Injector {
 
-    private static final Key LISTENER_KEY = Key.key("messageutil:cii");
+    private static final String LISTENER_KEY_BASE = "messageutil:cii_";
 
+    private final Key LISTENER_KEY = Key.key(LISTENER_KEY_BASE + UUID.randomUUID());
     private boolean injected = false;
 
     @Override
     public void inject() {
-        ChannelInitializeListenerHolder.addListener(LISTENER_KEY, channel -> channel.pipeline().addBefore("packet_handler", "cii_handler", new PacketInterceptor() {
-            private final PacketContext context = new PacketContext(channel);
+        String name = "cii_handler" + UUID.randomUUID();
+        ChannelInitializeListenerHolder.addListener(LISTENER_KEY, channel -> channel.pipeline().addBefore("packet_handler", name, new PacketInterceptor() {
+            private final PacketContext context = new PacketContext(channel, name);
 
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

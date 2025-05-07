@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.lumine1909:messageutil:1.0.2")
+    implementation("io.github.lumine1909:messageutil:1.0.3")
 }
 ```
 
@@ -19,13 +19,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class DemoPlugin extends JavaPlugin implements Listener {
+public class DemoPlugin extends JavaPlugin {
 
-    private final MessageUtil messageUtil = new MessageUtil(this, MessageUtil.InjectorType.PLAYER_LIST);
+    private final MessageUtil messageUtil = new MessageUtil(this);
 
     @Override
     public void onEnable() {
-        Bukkit.getPluginManager().registerEvents(this, this);
         messageUtil.enable();
         messageUtil.getMessengerManager().register(new DemoReceiver());
     }

@@ -14,6 +14,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 
+import java.util.UUID;
+
 
 public class PlayerListInjector implements Injector {
 
@@ -23,8 +25,9 @@ public class PlayerListInjector implements Injector {
     private InjectedPlayerList injectedPlayerList;
 
     protected static void inject2Player(Connection connection, ServerPlayer player) {
-        PacketContext context = new PacketContext(player, connection);
-        connection.channel.pipeline().addBefore("packet_handler", "pli_handler", new PacketInterceptor() {
+        String name = "pli_handler" + UUID.randomUUID();
+        PacketContext context = new PacketContext(player, connection, name);
+        connection.channel.pipeline().addBefore("packet_handler", name, new PacketInterceptor() {
             @Override
             protected PacketContext context() {
                 return context;

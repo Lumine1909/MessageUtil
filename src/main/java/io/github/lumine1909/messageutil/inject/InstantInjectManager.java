@@ -11,7 +11,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static io.github.lumine1909.messageutil.object.PacketContext.CONTEXT_CACHE;
 
 public class InstantInjectManager {
 
@@ -22,8 +25,9 @@ public class InstantInjectManager {
             return;
         }
         ServerPlayer sp = ((CraftPlayer) player).getHandle();
-        PacketContext context = new PacketContext(sp);
-        sp.connection.connection.channel.pipeline().addBefore("packet_handler", "instant_handler", new PacketInterceptor() {
+        String name = "instant_handler" + UUID.randomUUID();
+        PacketContext context = new PacketContext(sp, name);
+        sp.connection.connection.channel.pipeline().addBefore("packet_handler", name, new PacketInterceptor() {
             @Override
             protected PacketContext context() {
                 return context;
@@ -34,18 +38,15 @@ public class InstantInjectManager {
     public static void uninjectPlayer(Player player) {
         ServerPlayer sp = ((CraftPlayer) player).getHandle();
         Channel channel = sp.connection.connection.channel;
-        removeHandler(channel, "instant_handler");
-        removeHandler(channel, "pjei_handler");
-        removeHandler(channel, "pli_handler");
-        removeHandler(channel, "cii_handler");
-        INJECTED_PLAYERS.remove(player);
-    }
-
-    private static void removeHandler(Channel channel, String handlerName) {
+        PacketContext context;
+        if ((context = CONTEXT_CACHE.getIfPresent(player.getName())) == null) {
+            return;
+        }
         try {
-            channel.pipeline().remove(handlerName);
+            channel.pipeline().remove(context.interceptor());
         } catch (Exception ignored) {
         }
+        INJECTED_PLAYERS.remove(player);
     }
 
     public static class AutoUninjectListener implements Listener {
@@ -53,7 +54,8 @@ public class InstantInjectManager {
         @EventHandler
         public void onPlayerQuit(PlayerQuitEvent event) {
             uninjectPlayer(event.getPlayer());
-            PacketContext.CONTEXT_CACHE.invalidate(event.getPlayer().getName());
+            CONTEXT_CACHE.invalidate(event.getPlayer().getName());
+            INJECTED_PLAYERS.remove(event.getPlayer());
         }
     }
 }
