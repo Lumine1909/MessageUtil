@@ -53,6 +53,7 @@ public class InstantInjectManager {
         @EventHandler
         public void onPlayerQuit(PlayerQuitEvent event) {
             uninjectPlayer(event.getPlayer());
+            PacketContext.CONTEXT_CACHE.invalidate(event.getPlayer().getName());
         }
     }
 }

@@ -19,5 +19,4 @@ public class PacketEvent {
     public void setCancelled(boolean isCancelled) {
         this.isCancelled = isCancelled;
     }
-
 }

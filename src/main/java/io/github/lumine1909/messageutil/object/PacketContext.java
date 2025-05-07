@@ -1,5 +1,7 @@
 package io.github.lumine1909.messageutil.object;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.minecraft.network.Connection;
@@ -16,6 +18,8 @@ import java.util.Optional;
 
 public class PacketContext {
 
+    public static Cache<String, PacketContext> CONTEXT_CACHE = CacheBuilder.newBuilder().build();
+
     private final Channel channel;
     private ServerPlayer player;
     private String name;
@@ -24,17 +28,20 @@ public class PacketContext {
         this.name = player.getGameProfile().getName();
         this.player = player;
         this.channel = player.connection.connection.channel;
+        CONTEXT_CACHE.put(name, this);
     }
 
     public PacketContext(ServerPlayer notPreparedPlayer, Connection connection) {
         this.player = notPreparedPlayer;
         this.channel = connection.channel;
         this.name = notPreparedPlayer.getGameProfile().getName();
+        CONTEXT_CACHE.put(name, this);
     }
 
     public PacketContext(Channel channel, String name) {
         this.name = name;
         this.channel = channel;
+        CONTEXT_CACHE.put(name, this);
     }
 
     public PacketContext(Channel channel) {

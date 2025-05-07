@@ -6,7 +6,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.lumine1909:messageutil:1.0.1-SNAPSHOT")
+    implementation("io.github.lumine1909:messageutil:1.0.2")
 }
 ```
 

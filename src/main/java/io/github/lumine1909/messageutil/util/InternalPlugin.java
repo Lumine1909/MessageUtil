@@ -10,7 +10,6 @@ import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginBase;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
+@SuppressWarnings({"removal", "UnstableApiUsage"})
 public class InternalPlugin extends PluginBase {
 
     public static final InternalPlugin INSTANCE = new InternalPlugin();
@@ -32,27 +32,27 @@ public class InternalPlugin extends PluginBase {
     }
 
     @Override
-    public File getDataFolder() {
+    public @NotNull File getDataFolder() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public PluginDescriptionFile getDescription() {
+    public @NotNull PluginDescriptionFile getDescription() {
         return pdf;
     }
 
     @Override
-    public io.papermc.paper.plugin.configuration.PluginMeta getPluginMeta() {
+    public io.papermc.paper.plugin.configuration.@NotNull PluginMeta getPluginMeta() {
         return pdf;
     }
 
     @Override
-    public FileConfiguration getConfig() {
+    public @NotNull FileConfiguration getConfig() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public InputStream getResource(String filename) {
+    public InputStream getResource(@NotNull String filename) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -67,7 +67,7 @@ public class InternalPlugin extends PluginBase {
     }
 
     @Override
-    public void saveResource(String resourcePath, boolean replace) {
+    public void saveResource(@NotNull String resourcePath, boolean replace) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -77,17 +77,17 @@ public class InternalPlugin extends PluginBase {
     }
 
     @Override
-    public PluginLogger getLogger() {
+    public @NotNull PluginLogger getLogger() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public PluginLoader getPluginLoader() {
+    public @NotNull org.bukkit.plugin.PluginLoader getPluginLoader() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public Server getServer() {
+    public @NotNull Server getServer() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -126,7 +126,7 @@ public class InternalPlugin extends PluginBase {
     }
 
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+    public ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, String id) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -136,17 +136,17 @@ public class InternalPlugin extends PluginBase {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String @NotNull [] args) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public @NotNull io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager<org.bukkit.plugin.Plugin> getLifecycleManager() {
+    public @NotNull io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager<org.bukkit.plugin.@NotNull Plugin> getLifecycleManager() {
         throw new UnsupportedOperationException("Not supported.");
     }
 }

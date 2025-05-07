@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "1.0.1"
+version = "1.0.2"
 description = "A utility project for handling mod and packet message in plugin-side"
 
 repositories {
